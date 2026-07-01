@@ -37,6 +37,8 @@ import lombok.Setter;
 @Table(name = "users")
 public class User implements UserDetails {
 	
+	private static final long serialVersionUID = 6855495595714588954L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
