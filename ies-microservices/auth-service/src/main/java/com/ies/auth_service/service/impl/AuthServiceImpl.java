@@ -1,8 +1,11 @@
 package com.ies.auth_service.service.impl;
 
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ies.auth_service.dto.CitizenUserRequest;
 import com.ies.auth_service.dto.LoginRequest;
 import com.ies.auth_service.dto.LoginResponse;
 import com.ies.auth_service.dto.RegisterRequest;
@@ -79,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 			throw new InvalidCredentialsException("Invalid email or password");
 		}
 		
-		String token = jwtService.generateToken(user.getEmail());
+		String token = jwtService.generateToken(user);
 		
 		return LoginResponse.builder()
 		        .id(user.getId())
@@ -88,5 +91,26 @@ public class AuthServiceImpl implements AuthService {
 		        .role(user.getRole())
 		        .accessToken(token)
 		        .build();
+	}
+	
+	@Override
+	public UUID createCitizenUser(CitizenUserRequest request) {
+
+	    if (userRepository.existsByEmail(request.getEmail())) {
+	        throw new RuntimeException("Email already exists");
+	    }
+
+	    User user = new User();
+
+	    user.setName(request.getName());
+	    user.setEmail(request.getEmail());
+	    user.setPassword(passwordEncoder.encode(request.getPassword()));
+	    user.setPhoneNumber(request.getPhoneNumber());
+	    user.setRole(Role.CITIZEN);
+	    user.setStatus(AccountStatus.ACTIVE);
+
+	    User savedUser = userRepository.save(user);
+
+	    return savedUser.getId();
 	}
 }

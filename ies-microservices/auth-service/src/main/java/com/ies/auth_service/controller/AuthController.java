@@ -1,5 +1,8 @@
 package com.ies.auth_service.controller;
 
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ies.auth_service.dto.CitizenUserRequest;
 import com.ies.auth_service.dto.LoginRequest;
 import com.ies.auth_service.dto.LoginResponse;
 import com.ies.auth_service.dto.RegisterRequest;
@@ -53,5 +57,15 @@ public class AuthController {
 	public ResponseEntity<String> me(Authentication authentication) {
 
 	    return ResponseEntity.ok(authentication.getName());
+	}
+	
+	@PostMapping("/citizen")
+	public ResponseEntity<UUID> createCitizenUser(
+	        @RequestBody @Valid CitizenUserRequest request) {
+
+		System.out.println("===== CREATE CITIZEN USER API HIT =====");
+		
+	    return ResponseEntity.status(HttpStatus.CREATED)
+	            .body(authService.createCitizenUser(request));
 	}
 }
