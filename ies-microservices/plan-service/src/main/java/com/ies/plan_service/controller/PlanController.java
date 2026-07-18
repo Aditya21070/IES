@@ -49,4 +49,38 @@ public class PlanController {
         return ResponseEntity.ok(
                 planService.getActivePlans());
     }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<PlanResponse> updatePlan(
+            @PathVariable Long id,
+            @Valid @RequestBody PlanRequest request) {
+
+        return ResponseEntity.ok(
+                planService.updatePlan(id, request));
+    }
+    
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<PlanResponse> activatePlan(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                planService.activatePlan(id));
+    }
+    
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<PlanResponse> deactivatePlan(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                planService.deactivatePlan(id));
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlan(
+            @PathVariable Long id) {
+
+        planService.deletePlan(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }

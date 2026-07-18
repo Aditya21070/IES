@@ -24,46 +24,67 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable())
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
 
-                .authorizeHttpRequests(auth -> auth
-                			.requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
-                			
-                        // Public endpoint (Citizen self registration)
-                        .requestMatchers(HttpMethod.POST, "/citizens/register").permitAll()
+            .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/citizens/me")
-                        .hasRole("CITIZEN")
-                        
-                        // Only Admin & Case Worker can register offline citizens
-                        .requestMatchers(HttpMethod.POST, "/citizens")
-                        .hasAnyRole("ADMIN", "CASE_WORKER")
+                // Health Check
+                .requestMatchers("/actuator/**").permitAll()
 
-                        // Only Admin & Case Worker can view citizens
-                        .requestMatchers(HttpMethod.GET, "/citizens/**")
-                        .hasAnyRole("ADMIN", "CASE_WORKER")
+                // -------------------------
+                // Application APIs
+                // -------------------------
+                .requestMatchers(HttpMethod.POST, "/applications/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
 
-                        // Any authenticated user
-                        .requestMatchers(
-                                "/applications/**",
-                                "/income-details/**",
-                                "/education-details/**",
-                                "/family-details/**",
-                                "/kids/**",
-                                "/bank-details/**"
-                        ).authenticated()
+                .requestMatchers(HttpMethod.PUT, "/applications/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
 
-                        .anyRequest().authenticated()
-                )
+                .requestMatchers(HttpMethod.GET, "/applications/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                // -------------------------
+                // Income APIs
+                // -------------------------
+                .requestMatchers("/income-details/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
+
+                // -------------------------
+                // Education APIs
+                // -------------------------
+                .requestMatchers("/education-details/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
+
+                // -------------------------
+                // Family APIs
+                // -------------------------
+                .requestMatchers("/family-details/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
+
+                // -------------------------
+                // Kids APIs
+                // -------------------------
+                .requestMatchers("/kids/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
+
+                // -------------------------
+                // Bank APIs
+                // -------------------------
+                .requestMatchers("/bank-details/**")
+                    .hasAnyRole("CITIZEN", "CASE_WORKER", "ADMIN")
+
+                // Any other request must be authenticated
+                .anyRequest().authenticated()
+            )
+
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
+            );
 
         return http.build();
     }

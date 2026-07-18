@@ -86,4 +86,83 @@ public class PlanServiceImpl implements PlanService {
                     "Maximum children cannot be negative.");
         }
     }
+    
+    @Override
+    public PlanResponse updatePlan(
+            Long id,
+            PlanRequest request) {
+
+        Plan plan = planRepository.findById(id)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeleted()))
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Plan not found."));
+
+        if (!plan.getPlanName().equalsIgnoreCase(request.getPlanName())
+                && planRepository.existsByPlanName(request.getPlanName())) {
+
+            throw new DuplicateResourceException(
+                    "Plan name already exists.");
+        }
+
+        validatePlan(request);
+
+        plan.setPlanName(request.getPlanName());
+        plan.setPlanCategory(request.getPlanCategory());
+        plan.setDescription(request.getDescription());
+        plan.setBenefitAmount(request.getBenefitAmount());
+        plan.setMinAge(request.getMinAge());
+        plan.setMaxAge(request.getMaxAge());
+        plan.setIncomeLimit(request.getIncomeLimit());
+        plan.setEmploymentRequired(request.getEmploymentRequired());
+        plan.setMaxChildren(request.getMaxChildren());
+
+        if (request.getActive() != null) {
+            plan.setActive(request.getActive());
+        }
+
+        Plan updatedPlan = planRepository.save(plan);
+
+        return planMapper.toResponse(updatedPlan);
+    }
+    
+    @Override
+    public PlanResponse activatePlan(Long id) {
+
+        Plan plan = planRepository.findById(id)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeleted()))
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Plan not found."));
+
+        plan.setActive(true);
+
+        return planMapper.toResponse(
+                planRepository.save(plan));
+    }
+    
+    @Override
+    public PlanResponse deactivatePlan(Long id) {
+
+        Plan plan = planRepository.findById(id)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeleted()))
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Plan not found."));
+
+        plan.setActive(false);
+
+        return planMapper.toResponse(
+                planRepository.save(plan));
+    }
+    
+    @Override
+    public void deletePlan(Long id) {
+
+        Plan plan = planRepository.findById(id)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeleted()))
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Plan not found."));
+
+        plan.setDeleted(true);
+
+        planRepository.save(plan);
+    }
 }

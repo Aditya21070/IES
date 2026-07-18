@@ -15,4 +15,13 @@ public interface PlanService {
 
     List<PlanResponse> getActivePlans();
 
+    PlanResponse updatePlan(
+            Long id,
+            PlanRequest request);
+    
+    PlanResponse activatePlan(Long id);
+
+    PlanResponse deactivatePlan(Long id);
+
+    void deletePlan(Long id);
 }

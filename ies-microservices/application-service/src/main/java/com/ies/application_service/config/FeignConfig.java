@@ -12,26 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Configuration
 public class FeignConfig {
 
-//    @Bean
-//    public RequestInterceptor requestInterceptor() {
-//
-//        return requestTemplate -> {
-//
-//            RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
-//
-//            if (attributes instanceof ServletRequestAttributes servletAttributes) {
-//
-//                HttpServletRequest request = servletAttributes.getRequest();
-//
-//                String authorization = request.getHeader("Authorization");
-//
-//                if (authorization != null && !authorization.isBlank()) {
-//                    requestTemplate.header("Authorization", authorization);
-//                }
-//            }
-//        };
-//    }
-	
 	@Bean
 	public RequestInterceptor requestInterceptor() {
 

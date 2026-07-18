@@ -14,4 +14,6 @@ public interface KidDetailsRepository
     boolean existsByAadhaarNumber(String aadhaarNumber);
 
     long countByApplicationId(Long applicationId);
+    
+    List<KidDetails> findAllByApplicationId(Long applicationId);
 }
