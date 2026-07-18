@@ -35,15 +35,24 @@ public class SecurityConfig {
                         // Public endpoint (Citizen self registration)
                         .requestMatchers(HttpMethod.POST, "/citizens/register").permitAll()
 
+                     // Citizen can view own profile
                         .requestMatchers("/citizens/me")
                         .hasRole("CITIZEN")
-                        
-                        // Only Admin & Case Worker can register offline citizens
+
+                        // Internal endpoint used by Application Service
+                        .requestMatchers(HttpMethod.GET, "/citizens/user/**")
+                        .hasAnyRole("ADMIN", "CASE_WORKER", "CITIZEN")
+
+                        // Offline registration
                         .requestMatchers(HttpMethod.POST, "/citizens")
                         .hasAnyRole("ADMIN", "CASE_WORKER")
 
-                        // Only Admin & Case Worker can view citizens
-                        .requestMatchers(HttpMethod.GET, "/citizens/**")
+                        // Admin & Case Worker can view all citizens
+                        .requestMatchers(HttpMethod.GET, "/citizens")
+                        .hasAnyRole("ADMIN", "CASE_WORKER")
+
+                        // Admin & Case Worker can view citizen by database id
+                        .requestMatchers(HttpMethod.GET, "/citizens/{id}")
                         .hasAnyRole("ADMIN", "CASE_WORKER")
 
                         // Any authenticated user

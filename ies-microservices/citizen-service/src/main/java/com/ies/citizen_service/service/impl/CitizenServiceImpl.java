@@ -162,4 +162,14 @@ public class CitizenServiceImpl implements CitizenService {
             throw new DuplicateResourceException("Aadhaar number already exists");
         }
     }
+    
+    @Override
+    public CitizenResponse getCitizenByUserId(UUID userId) {
+
+        Citizen citizen = citizenRepository.findByUserId(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Citizen not found"));
+
+        return citizenMapper.toResponse(citizen);
+    }
 }

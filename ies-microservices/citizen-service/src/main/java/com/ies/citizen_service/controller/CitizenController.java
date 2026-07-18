@@ -1,6 +1,7 @@
 package com.ies.citizen_service.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +65,13 @@ public class CitizenController {
         String token = authHeader.substring(7);
 
         return ResponseEntity.ok(citizenService.getLoggedInCitizen(token));
+    }
+    
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<CitizenResponse> getCitizenByUserId(
+            @PathVariable UUID userId) {
+
+        return ResponseEntity.ok(
+                citizenService.getCitizenByUserId(userId));
     }
 }

@@ -23,11 +23,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+    	
+	    	System.out.println("===== Citizen JWT Filter =====");
+	    	System.out.println(request.getRequestURI());
+	    	System.out.println(request.getHeader("Authorization"));
 
         final String authHeader = request.getHeader("Authorization");
 

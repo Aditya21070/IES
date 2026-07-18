@@ -28,21 +28,22 @@ public class CitizenMapper {
 
     public CitizenResponse toResponse(Citizen citizen) {
 
-        return CitizenResponse.builder()
-                .id(citizen.getId())
-                .citizenNumber(citizen.getCitizenNumber())
-                .fullName(citizen.getFullName())
-                .email(citizen.getEmail())
-                .phoneNumber(citizen.getPhoneNumber())
-                .portalAccess(citizen.getPortalAccess())
-                .dob(citizen.getDob())
-                .gender(citizen.getGender())
-                .aadhaarNumber(citizen.getAadhaarNumber())
-                .address(citizen.getAddress())
-                .city(citizen.getCity())
-                .state(citizen.getState())
-                .pincode(citizen.getPincode())
-                .createdAt(citizen.getCreatedAt())
-                .build();
+	    	return CitizenResponse.builder()
+	    	        .id(citizen.getId())
+	    	        .userId(citizen.getUserId())   // <-- ADD THIS
+	    	        .citizenNumber(citizen.getCitizenNumber())
+	    	        .fullName(citizen.getFullName())
+	    	        .email(citizen.getEmail())
+	    	        .phoneNumber(citizen.getPhoneNumber())
+	    	        .portalAccess(citizen.getPortalAccess())
+	    	        .dob(citizen.getDob())
+	    	        .gender(citizen.getGender())
+	    	        .aadhaarNumber(citizen.getAadhaarNumber())
+	    	        .address(citizen.getAddress())
+	    	        .city(citizen.getCity())
+	    	        .state(citizen.getState())
+	    	        .pincode(citizen.getPincode())
+	    	        .createdAt(citizen.getCreatedAt())
+	    	        .build();	
     }
 }

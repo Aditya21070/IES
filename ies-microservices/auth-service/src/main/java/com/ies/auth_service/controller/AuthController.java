@@ -62,8 +62,6 @@ public class AuthController {
 	@PostMapping("/citizen")
 	public ResponseEntity<UUID> createCitizenUser(
 	        @RequestBody @Valid CitizenUserRequest request) {
-
-		System.out.println("===== CREATE CITIZEN USER API HIT =====");
 		
 	    return ResponseEntity.status(HttpStatus.CREATED)
 	            .body(authService.createCitizenUser(request));
