@@ -12,19 +12,15 @@ import com.ies.application_service.mapper.IncomeMapper;
 import com.ies.application_service.repository.ApplicationRepository;
 import com.ies.application_service.repository.IncomeDetailsRepository;
 import com.ies.application_service.service.IncomeDetailsService;
+import com.ies.application_service.service.security.ApplicationSecurityService;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.UUID;
-
-import com.ies.application_service.security.JwtService;
-import com.ies.application_service.exceptions.ForbiddenException;
 
 @Service
 @RequiredArgsConstructor
 public class IncomeDetailsServiceImpl implements IncomeDetailsService {
 
-	private final JwtService jwtService;
+	private final ApplicationSecurityService applicationSecurityService;
 	
     private final IncomeDetailsRepository incomeRepository;
 
@@ -37,16 +33,10 @@ public class IncomeDetailsServiceImpl implements IncomeDetailsService {
             IncomeRequest request,
             String token) {
 
-        Application application = applicationRepository.findById(request.getApplicationId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Application not found"));
-
-        UUID loggedInUser = jwtService.extractUserId(token);
-
-        if (!application.getCitizenUserId().equals(loggedInUser)) {
-            throw new ForbiddenException(
-                    "You are not allowed to update this application.");
-        }
+	    	Application application =
+	    	        applicationSecurityService.validateOwnership(
+	    	                request.getApplicationId(),
+	    	                token);
 
         if (incomeRepository.existsByApplicationId(application.getId())) {
             throw new DuplicateResourceException(

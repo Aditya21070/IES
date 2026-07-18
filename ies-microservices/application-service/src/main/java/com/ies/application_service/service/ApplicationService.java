@@ -9,4 +9,9 @@ public interface ApplicationService {
             ApplicationRequest request,
             String token);
 
+    ApplicationResponse submitApplication(
+            Long applicationId,
+            String token);
+
+    ApplicationResponse getApplication(Long applicationId);
 }

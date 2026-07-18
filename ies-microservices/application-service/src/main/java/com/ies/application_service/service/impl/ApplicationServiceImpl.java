@@ -8,13 +8,21 @@ import com.ies.application_service.dto.ApplicationRequest;
 import com.ies.application_service.dto.ApplicationResponse;
 import com.ies.application_service.dto.feign.CitizenResponse;
 import com.ies.application_service.entity.Application;
+import com.ies.application_service.entity.FamilyDetails;
 import com.ies.application_service.enums.ApplicationStatus;
 import com.ies.application_service.exceptions.BadRequestException;
+import com.ies.application_service.exceptions.ResourceNotFoundException;
 import com.ies.application_service.feign.CitizenFeignClient;
 import com.ies.application_service.mapper.ApplicationMapper;
 import com.ies.application_service.repository.ApplicationRepository;
+import com.ies.application_service.repository.BankDetailsRepository;
+import com.ies.application_service.repository.EducationDetailsRepository;
+import com.ies.application_service.repository.FamilyDetailsRepository;
+import com.ies.application_service.repository.IncomeDetailsRepository;
+import com.ies.application_service.repository.KidDetailsRepository;
 import com.ies.application_service.security.JwtService;
 import com.ies.application_service.service.ApplicationService;
+import com.ies.application_service.service.security.ApplicationSecurityService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +37,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final JwtService jwtService;
 
     private final CitizenFeignClient citizenFeignClient;
+    
+    private final IncomeDetailsRepository incomeRepository;
+
+    private final EducationDetailsRepository educationRepository;
+
+    private final FamilyDetailsRepository familyRepository;
+
+    private final KidDetailsRepository kidRepository;
+
+    private final BankDetailsRepository bankRepository;
+
+    private final ApplicationSecurityService applicationSecurityService;
     
     @Override
     public ApplicationResponse createApplication(
@@ -63,5 +83,79 @@ public class ApplicationServiceImpl implements ApplicationService {
     
     private String generateApplicationNumber() {
         return "APP-" + System.currentTimeMillis();
+    }
+    
+    @Override
+    public ApplicationResponse submitApplication(
+            Long applicationId,
+            String token) {
+
+        // 1. Verify ownership
+        applicationSecurityService.validateOwnership(
+                applicationId,
+                token);
+
+        // 2. Fetch application
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Application not found."));
+
+        // 3. Only DRAFT applications can be submitted
+        if (application.getStatus() != ApplicationStatus.DRAFT) {
+            throw new BadRequestException(
+                    "Application has already been submitted.");
+        }
+
+        // 4. Income
+        if (!incomeRepository.existsByApplicationId(applicationId)) {
+            throw new BadRequestException(
+                    "Income details are missing.");
+        }
+
+        // 5. Education
+        if (!educationRepository.existsByApplicationId(applicationId)) {
+            throw new BadRequestException(
+                    "Education details are missing.");
+        }
+
+        // 6. Family
+        FamilyDetails family = familyRepository.findByApplicationId(applicationId)
+                .orElseThrow(() ->
+                        new BadRequestException(
+                                "Family details are missing."));
+
+        // 7. Kids validation
+        long kidCount = kidRepository.countByApplicationId(applicationId);
+
+        if (family.getNumberOfChildren() != null &&
+                kidCount != family.getNumberOfChildren()) {
+
+            throw new BadRequestException(
+                    "Please complete children details.");
+        }
+
+        // 8. Bank
+        if (!bankRepository.existsByApplicationId(applicationId)) {
+            throw new BadRequestException(
+                    "Bank details are missing.");
+        }
+
+        // 9. Submit
+        application.setStatus(ApplicationStatus.SUBMITTED);
+
+        Application savedApplication =
+                applicationRepository.save(application);
+
+        return applicationMapper.toResponse(savedApplication);
+    }
+    
+    @Override
+    public ApplicationResponse getApplication(Long applicationId) {
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Application not found."));
+
+        return applicationMapper.toResponse(application);
     }
 }

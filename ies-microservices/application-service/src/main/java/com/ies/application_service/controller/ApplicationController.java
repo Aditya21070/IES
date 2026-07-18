@@ -27,4 +27,22 @@ public class ApplicationController {
                 .body(applicationService.createApplication(request, token));
     }
 
+    @GetMapping("/{applicationId}")
+    public ResponseEntity<ApplicationResponse> getApplication(
+            @PathVariable Long applicationId) {
+
+        return ResponseEntity.ok(
+                applicationService.getApplication(applicationId));
+    }
+    
+    @PostMapping("/{applicationId}/submit")
+    public ResponseEntity<ApplicationResponse> submitApplication(
+            @PathVariable Long applicationId,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+
+        return ResponseEntity.ok(
+                applicationService.submitApplication(applicationId, token));
+    }
 }
