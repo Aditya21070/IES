@@ -34,6 +34,14 @@ public class SecurityConfig {
 
                 // Health Check
                 .requestMatchers("/actuator/**").permitAll()
+                
+                .requestMatchers("/applications/dashboard/**")
+                .hasAnyRole("ADMIN", "CASE_WORKER")
+                
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/applications/internal/**")
+                    .permitAll()
 
                 // -------------------------
                 // Application APIs

@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import com.ies.application_service.dto.ApplicationRequest;
 import com.ies.application_service.dto.ApplicationResponse;
 import com.ies.application_service.dto.ApplicationSummaryResponse;
+import com.ies.application_service.dto.dashboard.ApplicationCountResponse;
+import com.ies.application_service.dto.dashboard.ApplicationStatusCountResponse;
+import com.ies.application_service.dto.dashboard.RecentApplicationsResponse;
 import com.ies.application_service.dto.feign.CitizenResponse;
 import com.ies.application_service.entity.Application;
 import com.ies.application_service.entity.BankDetails;
@@ -233,5 +236,40 @@ public class ApplicationServiceImpl implements ApplicationService {
         Application saved = applicationRepository.save(application);
 
         return applicationMapper.toResponse(saved);
+    }
+    
+    @Override
+    public ApplicationCountResponse getApplicationCount() {
+
+        return ApplicationCountResponse.builder()
+                .totalApplications(applicationRepository.count())
+                .build();
+    }
+    
+    @Override
+    public ApplicationStatusCountResponse getApplicationStatusCount(
+            ApplicationStatus status) {
+
+        return ApplicationStatusCountResponse.builder()
+                .status(status)
+                .count(applicationRepository.countByStatus(status))
+                .build();
+    }
+    
+    @Override
+    public List<RecentApplicationsResponse> getRecentApplications() {
+
+        return applicationRepository
+                .findTop10ByOrderByCreatedAtDesc()
+                .stream()
+                .map(application -> RecentApplicationsResponse.builder()
+                        .applicationId(application.getId())
+                        .applicationNumber(application.getApplicationNumber())
+                        .citizenId(application.getCitizenId())
+                        .planId(application.getPlanId())
+                        .status(application.getStatus())
+                        .createdAt(application.getCreatedAt())
+                        .build())
+                .toList();
     }
 }

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ies.application_service.entity.Application;
+import com.ies.application_service.enums.ApplicationStatus;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
@@ -17,5 +18,11 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findByCitizenUserId(UUID citizenUserId);
 
     boolean existsByApplicationNumber(String applicationNumber);
+
+    long count();
+
+    long countByStatus(ApplicationStatus status);
+
+    List<Application> findTop10ByOrderByCreatedAtDesc();
 
 }

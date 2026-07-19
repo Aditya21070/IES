@@ -17,7 +17,7 @@ public interface ApplicationFeignClient {
     ApplicationSummaryResponse getApplicationSummary(
             @PathVariable Long id);
     
-    @PutMapping("/applications/{id}/status")
+    @PutMapping("/applications/internal/{id}/status")
     ApplicationResponse updateApplicationStatus(
             @PathVariable Long id,
             @RequestBody UpdateApplicationStatusRequest request);

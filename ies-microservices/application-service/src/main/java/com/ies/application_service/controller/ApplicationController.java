@@ -1,5 +1,7 @@
 package com.ies.application_service.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,10 @@ import com.ies.application_service.dto.ApplicationRequest;
 import com.ies.application_service.dto.ApplicationResponse;
 import com.ies.application_service.dto.ApplicationSummaryResponse;
 import com.ies.application_service.dto.UpdateApplicationStatusRequest;
+import com.ies.application_service.dto.dashboard.ApplicationCountResponse;
+import com.ies.application_service.dto.dashboard.ApplicationStatusCountResponse;
+import com.ies.application_service.dto.dashboard.RecentApplicationsResponse;
+import com.ies.application_service.enums.ApplicationStatus;
 import com.ies.application_service.service.ApplicationService;
 
 import jakarta.validation.Valid;
@@ -63,7 +69,7 @@ public class ApplicationController {
                 applicationService.getApplicationSummary(id));
     }
     
-    @PutMapping("/{id}/status")
+    @PutMapping("/internal/{id}/status")
     public ResponseEntity<ApplicationResponse> updateStatus(
             @PathVariable Long id,
             @RequestBody UpdateApplicationStatusRequest request) {
@@ -72,5 +78,27 @@ public class ApplicationController {
                 applicationService.updateStatus(
                         id,
                         request.getStatus()));
+    }
+    
+    @GetMapping("/dashboard/count")
+    public ResponseEntity<ApplicationCountResponse> getApplicationCount() {
+
+        return ResponseEntity.ok(
+                applicationService.getApplicationCount());
+    }
+    
+    @GetMapping("/dashboard/status/{status}")
+    public ResponseEntity<ApplicationStatusCountResponse> getStatusCount(
+            @PathVariable ApplicationStatus status) {
+
+        return ResponseEntity.ok(
+                applicationService.getApplicationStatusCount(status));
+    }
+    
+    @GetMapping("/dashboard/recent")
+    public ResponseEntity<List<RecentApplicationsResponse>> getRecentApplications() {
+
+        return ResponseEntity.ok(
+                applicationService.getRecentApplications());
     }
 }
