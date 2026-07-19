@@ -10,5 +10,7 @@ public interface BankDetailsService {
             String token);
 
     BankResponse getBankDetails(Long applicationId);
+    
+    BankResponse getBankDetailsByApplicationId(Long applicationId);
 
 }

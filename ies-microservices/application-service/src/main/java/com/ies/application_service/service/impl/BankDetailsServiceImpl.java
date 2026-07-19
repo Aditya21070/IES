@@ -63,4 +63,15 @@ public class BankDetailsServiceImpl implements BankDetailsService {
 
         return bankMapper.toResponse(bank);
     }
+    
+    @Override
+    public BankResponse getBankDetailsByApplicationId(Long applicationId) {
+
+        BankDetails bankDetails = bankRepository
+                .findByApplicationId(applicationId)
+                .orElseThrow(() ->
+                        new RuntimeException("Bank details not found."));
+
+        return bankMapper.toResponse(bankDetails);
+    }
 }
